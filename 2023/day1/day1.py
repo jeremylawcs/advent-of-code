@@ -30,10 +30,10 @@ def find_numbers(line):
     rfind_index = line.rfind(number_string)
     if rfind_index >= 0:
       if high[0] == -1: # has not found anything
-        high[0] = find_index
+        high[0] = rfind_index
         high[1] = number
-      elif find_index > high[0]: # after initial find
-        high[0] = find_index
+      elif rfind_index > high[0]: # after initial find
+        high[0] = rfind_index
         high[1] = number
 
       if high[1] == number:
