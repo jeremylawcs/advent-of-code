@@ -4,6 +4,44 @@ import sys
 import string
 import logging
 
+def find_numbers(line):
+  array=["1", "2", "3", "4", "5", "6", "7", "8", "9", 
+        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+  # Tuples in the order of (index, value)
+  low = [-1, -1]
+  high = [-1, -1]
+  for index, number_string in enumerate(array):
+    number = int(number_string if number_string.isdigit() else array[index-9])
+    logging.debug("\tSearching for %s", number_string)
+
+    find_index = line.find(number_string)
+    if find_index >= 0:
+      if low[0] == -1: # has not found anything
+        low[0] = find_index
+        low[1] = number
+      elif find_index < low[0]: # after initial find
+        low[0] = find_index
+        low[1] = number
+
+      if low[1] == number:
+        logging.debug("\tNew low found: %s", number_string);
+
+
+    rfind_index = line.rfind(number_string)
+    if rfind_index >= 0:
+      if high[0] == -1: # has not found anything
+        high[0] = find_index
+        high[1] = number
+      elif find_index > high[0]: # after initial find
+        high[0] = find_index
+        high[1] = number
+
+      if high[1] == number:
+        logging.debug("\tNew high found: %s", number_string);
+
+  return (low[1], high[1])
+
+
 def main():
   debug_mode = False
   break_line = 0
@@ -20,13 +58,15 @@ def main():
     accumulated_number = 0
     line_number = 1
     for line in input_file:
+      line = line.strip()
+      logging.debug("Line %d: '%s'.", line_number, line)
       num_string = ""
-      for char_idx, ea_character in enumerate(line):
-        if ea_character in string.digits:
-          num_string += ea_character
-      first_and_last = int(num_string[0] + num_string[-1]) 
+      lowest, highest = find_numbers(line)
+      logging.debug("\tLowest: %s, highest: %s", lowest, highest)
+      low_high_string = f"{lowest}{highest}"
+      first_and_last = int(low_high_string) 
       accumulated_number +=  first_and_last
-      logging.debug("Line %d: %s turns into %d", line_number, num_string, first_and_last)
+      logging.debug("\tNew accumulated value: %s", accumulated_number)
 
       # Only process a certain amount of lines
       if break_line > 0 and line_number >= break_line:
